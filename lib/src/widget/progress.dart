@@ -20,6 +20,7 @@ class ProgressStyle {
   final BorderRadius gradientBorderRadius;
   final Color accent;
   final Color variant;
+  final Color color;
   final LightSource lightSource;
 
   final AlignmentGeometry progressGradientStart;
@@ -38,6 +39,7 @@ class ProgressStyle {
     this.progressGradientStart,
     this.progressGradientEnd,
     this.variant,
+    this.color,
     this.border = const NeumorphicBorder.none(),
   });
 
@@ -54,6 +56,7 @@ class ProgressStyle {
           gradientBorderRadius == other.gradientBorderRadius &&
           accent == other.accent &&
           variant == other.variant &&
+          color == other.color &&
           progressGradientStart == other.progressGradientStart &&
           progressGradientEnd == other.progressGradientEnd;
 
@@ -67,6 +70,7 @@ class ProgressStyle {
       border.hashCode ^
       accent.hashCode ^
       variant.hashCode ^
+      color.hashCode ^
       progressGradientStart.hashCode ^
       progressGradientEnd.hashCode;
 }
@@ -121,12 +125,10 @@ class NeumorphicProgress extends StatefulWidget {
 
   @override
   // ignore: invalid_override_of_non_virtual_member
-  int get hashCode =>
-      percent.hashCode ^ height.hashCode ^ style.hashCode ^ curve.hashCode;
+  int get hashCode => percent.hashCode ^ height.hashCode ^ style.hashCode ^ curve.hashCode;
 }
 
-class _NeumorphicProgressState extends State<NeumorphicProgress>
-    with TickerProviderStateMixin {
+class _NeumorphicProgressState extends State<NeumorphicProgress> with TickerProviderStateMixin {
   double oldPercent = 0;
 
   AnimationController _controller;
@@ -136,8 +138,7 @@ class _NeumorphicProgressState extends State<NeumorphicProgress>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration);
-    _animation = Tween<double>(begin: widget.percent, end: oldPercent)
-        .animate(_controller);
+    _animation = Tween<double>(begin: widget.percent, end: oldPercent).animate(_controller);
   }
 
   @override
@@ -171,6 +172,7 @@ class _NeumorphicProgressState extends State<NeumorphicProgress>
         child: Neumorphic(
           padding: EdgeInsets.zero,
           style: NeumorphicStyle(
+            color: widget.style.color ?? theme.baseColor,
             boxShape: NeumorphicBoxShape.roundRect(widget.style.borderRadius),
             disableDepth: widget.style.disableDepth,
             border: widget.style.border,
@@ -184,12 +186,9 @@ class _NeumorphicProgressState extends State<NeumorphicProgress>
                   alignment: Alignment.centerLeft,
                   widthFactor: _animation.value,
                   child: _GradientProgress(
-                    borderRadius: widget.style.gradientBorderRadius ??
-                        widget.style.borderRadius,
-                    begin: widget.style.progressGradientStart ??
-                        Alignment.centerLeft,
-                    end: widget.style.progressGradientEnd ??
-                        Alignment.centerRight,
+                    borderRadius: widget.style.gradientBorderRadius ?? widget.style.borderRadius,
+                    begin: widget.style.progressGradientStart ?? Alignment.centerLeft,
+                    end: widget.style.progressGradientEnd ?? Alignment.centerRight,
                     colors: [
                       widget.style.variant ?? theme.variantColor,
                       widget.style.accent ?? theme.accentColor,
@@ -252,16 +251,10 @@ class NeumorphicProgressIndeterminate extends StatefulWidget {
 
   @override
   // ignore: invalid_override_of_non_virtual_member
-  int get hashCode =>
-      height.hashCode ^
-      style.hashCode ^
-      duration.hashCode ^
-      reverse.hashCode ^
-      curve.hashCode;
+  int get hashCode => height.hashCode ^ style.hashCode ^ duration.hashCode ^ reverse.hashCode ^ curve.hashCode;
 }
 
-class _NeumorphicProgressIndeterminateState
-    extends State<NeumorphicProgressIndeterminate>
+class _NeumorphicProgressIndeterminateState extends State<NeumorphicProgressIndeterminate>
     with TickerProviderStateMixin {
   AnimationController _controller;
   Animation _animation;
@@ -270,16 +263,13 @@ class _NeumorphicProgressIndeterminateState
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration);
-    _animation = Tween<double>(begin: 0, end: 1)
-        .animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+    _animation = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
     _loop();
   }
 
   void _loop() async {
     try {
-      await _controller
-          .repeat(min: 0, max: 1, reverse: widget.reverse)
-          .orCancel;
+      await _controller.repeat(min: 0, max: 1, reverse: widget.reverse).orCancel;
     } on TickerCanceled {}
   }
 
@@ -312,23 +302,16 @@ class _NeumorphicProgressIndeterminateState
                 animation: _animation,
                 builder: (_, __) {
                   return Padding(
-                    padding: EdgeInsets.only(
-                        left: constraints.maxWidth * _animation.value),
+                    padding: EdgeInsets.only(left: constraints.maxWidth * _animation.value),
                     child: FractionallySizedBox(
                       heightFactor: 1,
                       alignment: Alignment.centerLeft,
                       widthFactor: _animation.value,
                       child: _GradientProgress(
-                        borderRadius: widget.style.gradientBorderRadius ??
-                            widget.style.borderRadius,
-                        begin: widget.style.progressGradientStart ??
-                            Alignment.centerLeft,
-                        end: widget.style.progressGradientEnd ??
-                            Alignment.centerRight,
-                        colors: [
-                          widget.style.accent ?? theme.accentColor,
-                          widget.style.variant ?? theme.variantColor
-                        ],
+                        borderRadius: widget.style.gradientBorderRadius ?? widget.style.borderRadius,
+                        begin: widget.style.progressGradientStart ?? Alignment.centerLeft,
+                        end: widget.style.progressGradientEnd ?? Alignment.centerRight,
+                        colors: [widget.style.accent ?? theme.accentColor, widget.style.variant ?? theme.variantColor],
                       ),
                     ),
                   );
@@ -351,8 +334,7 @@ class _GradientProgress extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: this.borderRadius,
-        gradient: LinearGradient(
-            begin: this.begin, end: this.end, colors: this.colors),
+        gradient: LinearGradient(begin: this.begin, end: this.end, colors: this.colors),
       ),
     );
   }

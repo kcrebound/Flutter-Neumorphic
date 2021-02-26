@@ -1,10 +1,10 @@
+import 'dart:math' show Random;
+
 import 'package:example/lib/Code.dart';
 import 'package:example/lib/color_selector.dart';
 import 'package:example/lib/top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-
-import 'dart:math' show Random;
 
 class ProgressWidgetPage extends StatefulWidget {
   ProgressWidgetPage({Key key}) : super(key: key);
@@ -140,6 +140,7 @@ Expanded(
       style: ProgressStyle(
            accent: Colors.green,
            variant: Colors.purple,
+           color: Colors.grey,
       ),
       percent: percent,
   ),
@@ -149,6 +150,7 @@ Expanded(
 
   Color accent = Colors.green;
   Color variant = Colors.purple;
+  Color backgroundColor = Colors.grey;
 
   Widget _buildWidget(BuildContext context) {
     return Padding(
@@ -176,6 +178,16 @@ Expanded(
                 },
                 color: variant,
               ),
+              SizedBox(width: 12),
+              Text("Color : "),
+              ColorSelector(
+                onColorChanged: (color) {
+                  setState(() {
+                    backgroundColor = color;
+                  });
+                },
+                color: backgroundColor,
+              ),
             ],
           ),
           SizedBox(height: 12),
@@ -192,6 +204,7 @@ Expanded(
                   style: ProgressStyle(
                     accent: accent,
                     variant: variant,
+                    color: backgroundColor,
                   ),
                   percent: percent,
                 ),
